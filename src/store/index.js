@@ -28,6 +28,13 @@ export default new Vuex.Store({
                         header: 'Успешный вход',
                     })
                     context.commit("setAuthorized", true);
+                    setTimeout(() => {
+                        context.commit("pushNewToast", {
+                            type: 'critical',
+                            header: 'Нельзя выполнить условие ТЗ - Authorization: Token {key}!',
+                            text: 'В ТЗ указано передавать с каждым запросом хэдер Authorization: Token {key}. Но в апи используется basic auth, поэтому ответы приходят со статусом 403. Поэтому используется хэдер "Authorization: Basic {base64 encoded}"'
+                        });
+                    }, 3000)
                     context.commit("encodeAuthData", `${body.username}:${body.password}`);
                 }
             }).catch(error => {
@@ -133,6 +140,11 @@ export default new Vuex.Store({
                     })
                     .then(response => {
                         if (response.status === 200) {
+                            context.commit("pushNewToast", {
+                                type: 'warning',
+                                header: 'ФИО не сохраняются!',
+                                text: 'Прошу заметить, что данное API не сохраняет переданные в заявке ФИО'
+                            });
                             return response.data;
                         }
                     })
@@ -150,6 +162,11 @@ export default new Vuex.Store({
                     })
                     .then(response => {
                         if (response.status === 200) {
+                            context.commit("pushNewToast", {
+                                type: 'warning',
+                                header: 'ФИО не сохраняются!',
+                                text: 'Прошу заметить, что данное API не сохраняет переданные в заявке ФИО'
+                            });
                             return response.data;
                         }
                     })
@@ -173,6 +190,7 @@ export default new Vuex.Store({
         },
         encodeAuthData(state, data) {
             state.authData = Vue.prototype.$bytesToBase64(new TextEncoder().encode(data));
+            console.log(state.authData);
         },
         setAppealsData(state, data) {
             state.appealsData = data;
